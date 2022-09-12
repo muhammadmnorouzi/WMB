@@ -55,6 +55,14 @@ impl Mul<f32> for Vector3D {
     }
 }
 
+impl Mul<f32> for &Vector3D {
+    type Output = Vector3D;
+
+    fn mul(self, scalar: f32) -> Self::Output {
+        Vector3D::create(self.x * scalar, self.y * scalar, self.z * scalar)
+    }
+}
+
 impl MulAssign<f32> for Vector3D {
     fn mul_assign(&mut self, scalar: f32) {
         self.x *= scalar;
@@ -64,6 +72,15 @@ impl MulAssign<f32> for Vector3D {
 }
 
 impl Div<f32> for Vector3D {
+    type Output = Vector3D;
+
+    fn div(self, right: f32) -> Self::Output {
+        let right = 1.0f32 / right;
+        self * right
+    }
+}
+
+impl Div<f32> for &Vector3D {
     type Output = Vector3D;
 
     fn div(self, right: f32) -> Self::Output {
@@ -124,6 +141,18 @@ impl Default for Vector3D {
 impl Vector3D {
     pub fn create(x: f32, y: f32, z: f32) -> Self {
         Self { x, y, z }
+    }
+
+    pub fn dot(&self, other: &Vector3D) -> f32 {
+        (self.x * other.x) + (self.y * other.y) + (self.z * other.z)
+    }
+
+    pub fn magnitude(&self) -> f32 {
+        return self.dot(self).sqrt();
+    }
+
+    pub fn normalize(&self) -> Vector3D {
+        self / self.magnitude()
     }
 }
 
@@ -240,6 +269,15 @@ mod tests {
     }
 
     #[test]
+    fn mul_scalar_borrowed_test() {
+        let v = &Vector3D::create(random_f32(), random_f32(), random_f32());
+        let scalar = random_f32();
+        let expected = Vector3D::create(v.x * scalar, v.y * scalar, v.z * scalar);
+
+        assert_eq!(expected, v * scalar);
+    }
+
+    #[test]
     fn mul_assign_scalar_test() {
         let x = random_f32();
         let y = random_f32();
@@ -264,6 +302,16 @@ mod tests {
     }
 
     #[test]
+    fn div_scalar_borrowed_test() {
+        let v = &Vector3D::create(random_f32(), random_f32(), random_f32());
+        let scalar = random_f32();
+        let scalar = 1.0f32 / scalar; //this is how we operate
+        let expected = Vector3D::create(v.x / scalar, v.y / scalar, v.z / scalar);
+
+        assert_eq!(expected, v / scalar);
+    }
+
+    #[test]
     fn div_assign_scalar_test() {
         let x = random_f32();
         let y = random_f32();
@@ -275,5 +323,30 @@ mod tests {
         v /= scalar;
 
         assert_eq!(expected, v);
+    }
+
+    #[test]
+    fn dot_test() {
+        let v1 = Vector3D::create(random_f32(), random_f32(), random_f32());
+        let v2 = Vector3D::create(random_f32(), random_f32(), random_f32());
+        let expected = (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
+
+        assert_eq!(v1.dot(&v2), expected);
+    }
+
+    #[test]
+    fn magnitude_test() {
+        let v1 = &Vector3D::create(random_f32(), random_f32(), random_f32());
+        let expected = v1.dot(v1).sqrt();
+
+        assert_eq!(v1.magnitude(), expected);
+    }
+
+    #[test]
+    fn normalize_test() {
+        let v1 = &Vector3D::create(random_f32(), random_f32(), random_f32());
+        let expected = v1 / v1.magnitude();
+
+        assert_eq!(v1.normalize(), expected);
     }
 }
