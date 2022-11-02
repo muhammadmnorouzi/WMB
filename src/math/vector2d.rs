@@ -85,9 +85,14 @@ impl Div<f32> for &Vector2D {
 
 impl DivAssign<f32> for Vector2D {
     fn div_assign(&mut self, scalar: f32) {
-        let scalar = 1.0f32 / scalar;
-        self.x *= scalar;
-        self.y *= scalar;
+        // error in value causes testing fail
+
+        // let scalar = 1.0f32 / scalar;
+        // self.x *= scalar;
+        // self.y *= scalar;
+
+        self.x /= scalar;
+        self.y /= scalar;
     }
 }
 

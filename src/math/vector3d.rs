@@ -91,10 +91,18 @@ impl Div<f32> for &Vector3D {
 
 impl DivAssign<f32> for Vector3D {
     fn div_assign(&mut self, scalar: f32) {
-        let scalar = 1.0f32 / scalar;
-        self.x *= scalar;
-        self.y *= scalar;
-        self.z *= scalar;
+        // commented code was producing error in values and tests
+        // were failing
+        // multiplying is better than dividing
+
+        // let scalar = 1.0f32 / scalar;
+        // self.x *= scalar;
+        // self.y *= scalar;
+        // self.z *= scalar;
+
+        self.x /= scalar;
+        self.y /= scalar;
+        self.z /= scalar;
     }
 }
 
@@ -318,7 +326,7 @@ mod tests {
         let z = random_f32();
         let mut v = Vector3D::create(x, y, z);
         let scalar = random_f32();
-        let expected = Vector3D::create(x / scalar, v.y / scalar, v.z / scalar);
+        let expected = Vector3D::create(v.x / scalar, v.y / scalar, v.z / scalar);
 
         v /= scalar;
 
