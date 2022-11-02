@@ -1,12 +1,9 @@
+use super::constants::*;
 use std::fmt::Debug;
 
-const ZERO: usize = 0;
-const THREE: usize = 3;
-const NINE: usize = 9;
-
-pub type Vec3D = [i32; 3];
-pub type Vec9D = [i32; 9];
-pub type Mat3x3 = [Vec3D; 3];
+pub type Vec3D = [i32; THREE];
+pub type Vec9D = [i32; NINE];
+pub type Mat3x3 = [Vec3D; THREE];
 
 #[derive(Debug)]
 pub struct Matrix3x3 {
