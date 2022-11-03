@@ -1,11 +1,14 @@
 use super::constants::*;
-use std::fmt::Debug;
+use std::{
+    fmt::Debug,
+    ops::{Add, Mul, Sub},
+};
 
 pub type Vec4D = [i32; FOUR];
 pub type Vec16D = [i32; SIXTEEN];
 pub type Mat4x4 = [Vec4D; FOUR];
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Matrix4x4 {
     inner: Mat4x4,
 }
@@ -90,6 +93,60 @@ impl From<i32> for Matrix4x4 {
     }
 }
 
+impl Add for Matrix4x4 {
+    type Output = Matrix4x4;
+
+    fn add(self, other: Self) -> Self::Output {
+        let mut result: Matrix4x4 = Default::default();
+
+        for i in 0..FOUR {
+            for j in 0..FOUR {
+                result.inner[i][j] = self.inner[i][j] + other.inner[i][j];
+            }
+        }
+
+        return result;
+    }
+}
+
+impl Sub for Matrix4x4 {
+    type Output = Matrix4x4;
+
+    fn sub(self, other: Self) -> Self::Output {
+        let mut result: Matrix4x4 = Default::default();
+
+        for i in 0..FOUR {
+            for j in 0..FOUR {
+                result.inner[i][j] = self.inner[i][j] - other.inner[i][j];
+            }
+        }
+
+        return result;
+    }
+}
+
+impl Mul<i32> for Matrix4x4 {
+    type Output = Matrix4x4;
+
+    fn mul(self, scalar: i32) -> Self::Output {
+        let mut result: Matrix4x4 = Default::default();
+
+        for i in 0..FOUR {
+            for j in 0..FOUR {
+                result.inner[i][j] = self.inner[i][j] * scalar;
+            }
+        }
+
+        return result;
+    }
+}
+
+impl PartialEq for Matrix4x4 {
+    fn eq(&self, other: &Self) -> bool {
+        self.inner == other.inner
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::math::random::random_i32;
@@ -142,6 +199,18 @@ mod tests {
             random_i32(),
             random_i32(),
         );
+    }
+
+    fn random_mat4x4() -> Matrix4x4 {
+        let mut mat = Matrix4x4::default();
+
+        for i in 0..FOUR {
+            for j in 0..FOUR {
+                mat.inner[i][j] = random_i32() % 1_000_000;
+            }
+        }
+
+        return mat;
     }
 
     #[test]
@@ -206,5 +275,59 @@ mod tests {
         assert_eq!(&c2, mat.col_at(1));
         assert_eq!(&c3, mat.col_at(2));
         assert_eq!(&c4, mat.col_at(3));
+    }
+
+    #[test]
+    fn add_test() {
+        let mat1 = random_mat4x4();
+        let mat2 = random_mat4x4();
+        let result = mat1 + mat2;
+
+        let mut expected = Matrix4x4::default();
+
+        for i in 0..FOUR {
+            for j in 0..FOUR {
+                expected.inner[i][j] = mat1.inner[i][j] + mat2.inner[i][j];
+            }
+            println!();
+        }
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn sub_test() {
+        let mat1 = random_mat4x4();
+        let mat2 = random_mat4x4();
+        let result = mat1 - mat2;
+
+        let mut expected = Matrix4x4::default();
+
+        for i in 0..FOUR {
+            for j in 0..FOUR {
+                expected.inner[i][j] = mat1.inner[i][j] - mat2.inner[i][j];
+            }
+            println!();
+        }
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn scalar_mul_test() {
+        let mat1 = random_mat4x4();
+        let scalar = random_i32() % 100 + 1;
+        let result = mat1 * scalar;
+
+        let mut expected = Matrix4x4::default();
+
+        for i in 0..FOUR {
+            for j in 0..FOUR {
+                expected.inner[i][j] = mat1.inner[i][j] * scalar;
+            }
+            println!();
+        }
+
+        assert_eq!(result, expected);
     }
 }

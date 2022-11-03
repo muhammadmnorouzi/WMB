@@ -1,11 +1,14 @@
 use super::constants::*;
-use std::fmt::Debug;
+use std::{
+    fmt::Debug,
+    ops::{Add, Mul, Sub},
+};
 
 pub type Vec3D = [i32; THREE];
 pub type Vec9D = [i32; NINE];
 pub type Mat3x3 = [Vec3D; THREE];
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Matrix3x3 {
     inner: Mat3x3,
 }
@@ -78,6 +81,60 @@ impl From<i32> for Matrix3x3 {
     }
 }
 
+impl Add for Matrix3x3 {
+    type Output = Matrix3x3;
+
+    fn add(self, other: Self) -> Self::Output {
+        let mut result: Matrix3x3 = Default::default();
+
+        for i in 0..THREE {
+            for j in 0..THREE {
+                result.inner[i][j] = self.inner[i][j] + other.inner[i][j];
+            }
+        }
+
+        return result;
+    }
+}
+
+impl Sub for Matrix3x3 {
+    type Output = Matrix3x3;
+
+    fn sub(self, other: Self) -> Self::Output {
+        let mut result: Matrix3x3 = Default::default();
+
+        for i in 0..THREE {
+            for j in 0..THREE {
+                result.inner[i][j] = self.inner[i][j] - other.inner[i][j];
+            }
+        }
+
+        return result;
+    }
+}
+
+impl Mul<i32> for Matrix3x3 {
+    type Output = Matrix3x3;
+
+    fn mul(self, scalar: i32) -> Self::Output {
+        let mut result: Matrix3x3 = Default::default();
+
+        for i in 0..THREE {
+            for j in 0..THREE {
+                result.inner[i][j] = self.inner[i][j] * scalar;
+            }
+        }
+
+        return result;
+    }
+}
+
+impl PartialEq for Matrix3x3 {
+    fn eq(&self, other: &Self) -> bool {
+        self.inner == other.inner
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::math::random::random_i32;
@@ -106,6 +163,18 @@ mod tests {
             random_i32(),
             random_i32(),
         );
+    }
+
+    fn random_mat3x3() -> Matrix3x3 {
+        let mut mat = Matrix3x3::default();
+
+        for i in 0..THREE {
+            for j in 0..THREE {
+                mat.inner[i][j] = random_i32() % 1_000_000;
+            }
+        }
+
+        return mat;
     }
 
     #[test]
@@ -157,5 +226,59 @@ mod tests {
         assert_eq!(&c1, mat.col_at(0));
         assert_eq!(&c2, mat.col_at(1));
         assert_eq!(&c3, mat.col_at(2));
+    }
+
+    #[test]
+    fn add_test() {
+        let mat1 = random_mat3x3();
+        let mat2 = random_mat3x3();
+        let result = mat1 + mat2;
+
+        let mut expected = Matrix3x3::default();
+
+        for i in 0..THREE {
+            for j in 0..THREE {
+                expected.inner[i][j] = mat1.inner[i][j] + mat2.inner[i][j];
+            }
+            println!();
+        }
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn sub_test() {
+        let mat1 = random_mat3x3();
+        let mat2 = random_mat3x3();
+        let result = mat1 - mat2;
+
+        let mut expected = Matrix3x3::default();
+
+        for i in 0..THREE {
+            for j in 0..THREE {
+                expected.inner[i][j] = mat1.inner[i][j] - mat2.inner[i][j];
+            }
+            println!();
+        }
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn scalar_mul_test() {
+        let mat1 = random_mat3x3();
+        let scalar = random_i32() % 100 + 1;
+        let result = mat1 * scalar;
+
+        let mut expected = Matrix3x3::default();
+
+        for i in 0..THREE {
+            for j in 0..THREE {
+                expected.inner[i][j] = mat1.inner[i][j] * scalar;
+            }
+            println!();
+        }
+
+        assert_eq!(result, expected);
     }
 }
