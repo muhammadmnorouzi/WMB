@@ -8,12 +8,48 @@ pub type Vec3D = [i32; THREE];
 pub type Vec9D = [i32; NINE];
 pub type Mat3x3 = [Vec3D; THREE];
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct Matrix3x3 {
     inner: Mat3x3,
 }
 
+impl Debug for Matrix3x3 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "\n----------------------------");
+        writeln!(f, "{:?}", self.inner[0]);
+        writeln!(f, "{:?}", self.inner[1]);
+        writeln!(f, "{:?}", self.inner[2]);
+        writeln!(f, "----------------------------");
+
+        Ok(())
+    }
+}
+
 impl Matrix3x3 {
+    pub fn new_row_major() -> Self {
+        let mut result = Self::default();
+
+        for i in 0..THREE {
+            for j in 0..THREE {
+                result.inner[i][j] = (i * THREE + j) as i32;
+            }
+        }
+
+        return result;
+    }
+
+    pub fn new_col_major() -> Self {
+        let mut result = Self::default();
+
+        for i in 0..THREE {
+            for j in 0..THREE {
+                result.inner[i][j] = (j * THREE + i) as i32;
+            }
+        }
+
+        return result;
+    }
+
     fn new(
         n00: i32,
         n01: i32,
@@ -132,6 +168,50 @@ impl Mul<i32> for Matrix3x3 {
 impl PartialEq for Matrix3x3 {
     fn eq(&self, other: &Self) -> bool {
         self.inner == other.inner
+    }
+}
+
+impl Mul<Matrix3x3> for Matrix3x3 {
+    type Output = Matrix3x3;
+
+    fn mul(self, other: Matrix3x3) -> Self::Output {
+        let n00: i32 = self.inner[0][0] * other.inner[0][0]
+            + self.inner[1][0] * other.inner[0][1]
+            + self.inner[2][0] * other.inner[0][2];
+
+        let n01: i32 = self.inner[0][0] * other.inner[1][0]
+            + self.inner[1][0] * other.inner[1][1]
+            + self.inner[2][0] * other.inner[1][2];
+
+        let n02: i32 = self.inner[0][0] * other.inner[2][0]
+            + self.inner[1][0] * other.inner[2][1]
+            + self.inner[2][0] * other.inner[2][2];
+
+        let n10: i32 = self.inner[0][1] * other.inner[0][0]
+            + self.inner[1][1] * other.inner[0][1]
+            + self.inner[2][1] * other.inner[0][2];
+
+        let n11: i32 = self.inner[0][1] * other.inner[1][0]
+            + self.inner[1][1] * other.inner[1][1]
+            + self.inner[2][1] * other.inner[1][2];
+
+        let n12: i32 = self.inner[0][1] * other.inner[2][0]
+            + self.inner[1][1] * other.inner[2][1]
+            + self.inner[2][1] * other.inner[2][2];
+
+        let n20: i32 = self.inner[0][2] * other.inner[0][0]
+            + self.inner[1][2] * other.inner[0][1]
+            + self.inner[2][2] * other.inner[0][2];
+
+        let n21: i32 = self.inner[0][2] * other.inner[1][0]
+            + self.inner[1][2] * other.inner[1][1]
+            + self.inner[2][2] * other.inner[1][2];
+
+        let n22: i32 = self.inner[0][2] * other.inner[2][0]
+            + self.inner[1][2] * other.inner[2][1]
+            + self.inner[2][2] * other.inner[2][2];
+
+        Self::new(n00, n01, n02, n10, n11, n12, n20, n21, n22)
     }
 }
 
