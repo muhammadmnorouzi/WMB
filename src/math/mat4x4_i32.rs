@@ -1,4 +1,5 @@
 use super::constants::*;
+
 use std::{
     fmt::Debug,
     ops::{Add, Mul, Sub},
@@ -8,12 +9,49 @@ pub type Vec4D = [i32; FOUR];
 pub type Vec16D = [i32; SIXTEEN];
 pub type Mat4x4 = [Vec4D; FOUR];
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone)]
 pub struct Matrix4x4 {
     inner: Mat4x4,
 }
 
+impl Debug for Matrix4x4 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "\n----------------------------");
+        writeln!(f, "{:?}", self.inner[0]);
+        writeln!(f, "{:?}", self.inner[1]);
+        writeln!(f, "{:?}", self.inner[2]);
+        writeln!(f, "{:?}", self.inner[3]);
+        writeln!(f, "----------------------------");
+
+        Ok(())
+    }
+}
+
 impl Matrix4x4 {
+    pub fn new_row_major() -> Self {
+        let mut result = Self::default();
+
+        for i in 0..FOUR {
+            for j in 0..FOUR {
+                result.inner[i][j] = (i * FOUR + j) as i32;
+            }
+        }
+
+        return result;
+    }
+
+    pub fn new_col_major() -> Self {
+        let mut result = Self::default();
+
+        for i in 0..FOUR {
+            for j in 0..FOUR {
+                result.inner[i][j] = (j * FOUR + i) as i32;
+            }
+        }
+
+        return result;
+    }
+
     fn new(
         n00: i32,
         n01: i32,
@@ -138,6 +176,96 @@ impl Mul<i32> for Matrix4x4 {
         }
 
         return result;
+    }
+}
+
+impl Mul<Matrix4x4> for Matrix4x4 {
+    type Output = Matrix4x4;
+
+    fn mul(self, other: Matrix4x4) -> Self::Output {
+        let n00: i32 = self.inner[0][0] * other.inner[0][0]
+            + self.inner[1][0] * other.inner[0][1]
+            + self.inner[2][0] * other.inner[0][2]
+            + self.inner[3][0] * other.inner[0][3];
+
+        let n01: i32 = self.inner[0][0] * other.inner[1][0]
+            + self.inner[1][0] * other.inner[1][1]
+            + self.inner[2][0] * other.inner[1][2]
+            + self.inner[3][0] * other.inner[1][3];
+
+        let n02: i32 = self.inner[0][0] * other.inner[2][0]
+            + self.inner[1][0] * other.inner[2][1]
+            + self.inner[2][0] * other.inner[2][2]
+            + self.inner[3][0] * other.inner[2][3];
+
+        let n03: i32 = self.inner[0][0] * other.inner[3][0]
+            + self.inner[1][0] * other.inner[3][1]
+            + self.inner[2][0] * other.inner[3][2]
+            + self.inner[3][0] * other.inner[3][3];
+
+        let n10: i32 = self.inner[0][1] * other.inner[0][0]
+            + self.inner[1][1] * other.inner[0][1]
+            + self.inner[2][1] * other.inner[0][2]
+            + self.inner[3][1] * other.inner[0][3];
+
+        let n11: i32 = self.inner[0][1] * other.inner[1][0]
+            + self.inner[1][1] * other.inner[1][1]
+            + self.inner[2][1] * other.inner[1][2]
+            + self.inner[3][1] * other.inner[1][3];
+
+        let n12: i32 = self.inner[0][1] * other.inner[2][0]
+            + self.inner[1][1] * other.inner[2][1]
+            + self.inner[2][1] * other.inner[2][2]
+            + self.inner[3][1] * other.inner[2][3];
+
+        let n13: i32 = self.inner[0][1] * other.inner[3][0]
+            + self.inner[1][1] * other.inner[3][1]
+            + self.inner[2][1] * other.inner[3][2]
+            + self.inner[3][1] * other.inner[3][3];
+
+        let n20: i32 = self.inner[0][2] * other.inner[0][0]
+            + self.inner[1][2] * other.inner[0][1]
+            + self.inner[2][2] * other.inner[0][2]
+            + self.inner[3][2] * other.inner[0][3];
+
+        let n21: i32 = self.inner[0][2] * other.inner[1][0]
+            + self.inner[1][2] * other.inner[1][1]
+            + self.inner[2][2] * other.inner[1][2]
+            + self.inner[3][2] * other.inner[1][3];
+
+        let n22: i32 = self.inner[0][2] * other.inner[2][0]
+            + self.inner[1][2] * other.inner[2][1]
+            + self.inner[2][2] * other.inner[2][2]
+            + self.inner[3][2] * other.inner[2][3];
+
+        let n23: i32 = self.inner[0][2] * other.inner[3][0]
+            + self.inner[1][2] * other.inner[3][1]
+            + self.inner[2][2] * other.inner[3][2]
+            + self.inner[3][2] * other.inner[3][3];
+
+        let n30: i32 = self.inner[0][3] * other.inner[0][0]
+            + self.inner[1][3] * other.inner[0][1]
+            + self.inner[2][3] * other.inner[0][2]
+            + self.inner[3][3] * other.inner[0][3];
+
+        let n31: i32 = self.inner[0][3] * other.inner[1][0]
+            + self.inner[1][3] * other.inner[1][1]
+            + self.inner[2][3] * other.inner[1][2]
+            + self.inner[3][3] * other.inner[1][3];
+
+        let n32: i32 = self.inner[0][3] * other.inner[2][0]
+            + self.inner[1][3] * other.inner[2][1]
+            + self.inner[2][3] * other.inner[2][2]
+            + self.inner[3][3] * other.inner[2][3];
+
+        let n33: i32 = self.inner[0][3] * other.inner[3][0]
+            + self.inner[1][3] * other.inner[3][1]
+            + self.inner[2][3] * other.inner[3][2]
+            + self.inner[3][3] * other.inner[3][3];
+
+        Self::new(
+            n00, n01, n02, n03, n10, n11, n12, n13, n20, n21, n22, n23, n30, n31, n32, n33,
+        )
     }
 }
 
