@@ -334,7 +334,7 @@ mod tests {
 
         for i in 0..FOUR {
             for j in 0..FOUR {
-                mat.inner[i][j] = random_i32() % 1_000_000;
+                mat.inner[i][j] = random_i32() % 10_000;
             }
         }
 
@@ -457,5 +457,112 @@ mod tests {
         }
 
         assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn matrix_mul_col_major_test() {
+        let left: Matrix4x4 = random_mat4x4();
+        let right: Matrix4x4 = random_mat4x4();
+        let result = left * right;
+
+        let mut expected = Matrix4x4::default();
+
+        // 00
+        expected.inner[0][0] = left.inner[0][0] * right.inner[0][0]
+            + left.inner[1][0] * right.inner[0][1]
+            + left.inner[2][0] * right.inner[0][2]
+            + left.inner[3][0] * right.inner[0][3];
+
+        // 01
+        expected.inner[1][0] = left.inner[0][0] * right.inner[1][0]
+            + left.inner[1][0] * right.inner[1][1]
+            + left.inner[2][0] * right.inner[1][2]
+            + left.inner[3][0] * right.inner[1][3];
+
+        // 02
+        expected.inner[2][0] = left.inner[0][0] * right.inner[2][0]
+            + left.inner[1][0] * right.inner[2][1]
+            + left.inner[2][0] * right.inner[2][2]
+            + left.inner[3][0] * right.inner[2][3];
+
+        // 03
+        expected.inner[3][0] = left.inner[0][0] * right.inner[3][0]
+            + left.inner[1][0] * right.inner[3][1]
+            + left.inner[2][0] * right.inner[3][2]
+            + left.inner[3][0] * right.inner[3][3];
+
+        // 10
+        expected.inner[0][1] = left.inner[0][1] * right.inner[0][0]
+            + left.inner[1][1] * right.inner[0][1]
+            + left.inner[2][1] * right.inner[0][2]
+            + left.inner[3][1] * right.inner[0][3];
+
+        // 11
+        expected.inner[1][1] = left.inner[0][1] * right.inner[1][0]
+            + left.inner[1][1] * right.inner[1][1]
+            + left.inner[2][1] * right.inner[1][2]
+            + left.inner[3][1] * right.inner[1][3];
+
+        // 12
+        expected.inner[2][1] = left.inner[0][1] * right.inner[2][0]
+            + left.inner[1][1] * right.inner[2][1]
+            + left.inner[2][1] * right.inner[2][2]
+            + left.inner[3][1] * right.inner[2][3];
+
+        // 13
+        expected.inner[3][1] = left.inner[0][1] * right.inner[3][0]
+            + left.inner[1][1] * right.inner[3][1]
+            + left.inner[2][1] * right.inner[3][2]
+            + left.inner[3][1] * right.inner[3][3];
+
+        // 20
+        expected.inner[0][2] = left.inner[0][2] * right.inner[0][0]
+            + left.inner[1][2] * right.inner[0][1]
+            + left.inner[2][2] * right.inner[0][2]
+            + left.inner[3][2] * right.inner[0][3];
+
+        // 21
+        expected.inner[1][2] = left.inner[0][2] * right.inner[1][0]
+            + left.inner[1][2] * right.inner[1][1]
+            + left.inner[2][2] * right.inner[1][2]
+            + left.inner[3][2] * right.inner[1][3];
+
+        // 22
+        expected.inner[2][2] = left.inner[0][2] * right.inner[2][0]
+            + left.inner[1][2] * right.inner[2][1]
+            + left.inner[2][2] * right.inner[2][2]
+            + left.inner[3][2] * right.inner[2][3];
+
+        // 23
+        expected.inner[3][2] = left.inner[0][2] * right.inner[3][0]
+            + left.inner[1][2] * right.inner[3][1]
+            + left.inner[2][2] * right.inner[3][2]
+            + left.inner[3][2] * right.inner[3][3];
+
+        // 30
+        expected.inner[0][3] = left.inner[0][3] * right.inner[0][0]
+            + left.inner[1][3] * right.inner[0][1]
+            + left.inner[2][3] * right.inner[0][2]
+            + left.inner[3][3] * right.inner[0][3];
+
+        // 31
+        expected.inner[1][3] = left.inner[0][3] * right.inner[1][0]
+            + left.inner[1][3] * right.inner[1][1]
+            + left.inner[2][3] * right.inner[1][2]
+            + left.inner[3][3] * right.inner[1][3];
+
+        // 32
+        expected.inner[2][3] = left.inner[0][3] * right.inner[2][0]
+            + left.inner[1][3] * right.inner[2][1]
+            + left.inner[2][3] * right.inner[2][2]
+            + left.inner[3][3] * right.inner[2][3];
+
+        // 33
+        expected.inner[3][3] = left.inner[0][3] * right.inner[3][0]
+            + left.inner[1][3] * right.inner[3][1]
+            + left.inner[2][3] * right.inner[3][2]
+            + left.inner[3][3] * right.inner[3][3];
+
+        assert_eq!(expected, result);
     }
 }
